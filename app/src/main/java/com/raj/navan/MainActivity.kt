@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(_binding.root)
-        newsAdapter = NewsAdapter() {
+        newsAdapter = NewsAdapter(::onBookMarkClicked) {
             val intent = Intent(this@MainActivity, WebNews::class.java)
             intent.putExtra("url", it.web_url)
             startActivity(intent)
@@ -53,10 +53,10 @@ class MainActivity : AppCompatActivity() {
 
         _viewModel.mediatorLiveData.observe(this) {
             when (it) {
-                is UiState.Error -> Toast.makeText(this@MainActivity, "OOPS", Toast.LENGTH_SHORT)
+                is UiState.Error -> Toast.makeText(this@MainActivity, "${it.e.toString()}", Toast.LENGTH_SHORT)
                     .show()
                 UiState.Loading -> {
-                  //loading progress
+                    //loading progress
                 }
                 is UiState.NewsResponseSuccess -> {
                     Log.d("TAG", "onCreate: ${it.data.response.docs.size}")
@@ -64,5 +64,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun onBookMarkClicked(url: String, isBookmarked: Boolean) {
+        Log.d(TAG, "onBookMarkClicked: $isBookmarked")
+        _viewModel.saveBookmark(url, isBookmarked)
+    }
+
+    companion object {
+        const val TAG = "Main"
     }
 }

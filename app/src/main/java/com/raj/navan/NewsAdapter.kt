@@ -9,10 +9,17 @@ import com.raj.navan.databinding.ItemLayoutBinding
 import com.raj.navan.repo.Doc
 import com.squareup.picasso.Picasso
 
-class NewsAdapter(val onclick: (doc: Doc) -> Unit) :
+class NewsAdapter(
+    private val onBookmark: (url: String, isBookmarked: Boolean) -> Unit,
+    private val onclick: (doc: Doc) -> Unit
+) :
     RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
     class NewsViewHolder(private val item: ItemLayoutBinding) : RecyclerView.ViewHolder(item.root) {
-        fun bind(doc: Doc, onclickNews: (doc: Doc) -> Unit) {
+        fun bind(
+            doc: Doc,
+            onBookmarkClick: (url: String, isBookmarked: Boolean) -> Unit,
+            onclickNews: (doc: Doc) -> Unit
+        ) {
             item.apply {
                 newsTitle.text = doc.headline.main
                 doc.multimedia?.let {
@@ -23,15 +30,23 @@ class NewsAdapter(val onclick: (doc: Doc) -> Unit) :
                         Picasso.get().load(image).into(newsImage);
                     } else {
                         newsImage.setImageResource(android.R.color.transparent);
-                        Log.e("TAG", "bind: the multimedia is empty", )
+                        Log.e("TAG", "bind: the multimedia is empty")
                     }
 
                 }
+                bookmarkImage.isSelected = doc.isBookMarked
+                bookmarkImage.setOnClickListener {
+                    bookmarkImage.isSelected = !bookmarkImage.isSelected
+                    doc.isBookMarked = bookmarkImage.isSelected
+                    onBookmarkClick(doc.web_url, bookmarkImage.isSelected)
 
+                }
             }
+
             item.root.setOnClickListener {
                 onclickNews(doc)
             }
+
         }
 
     }
@@ -51,7 +66,7 @@ class NewsAdapter(val onclick: (doc: Doc) -> Unit) :
     override fun getItemCount(): Int = news.size
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
-        holder.bind(news[position], onclick)
+        holder.bind(news[position], onBookmark, onclick)
     }
 
 
