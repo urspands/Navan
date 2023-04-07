@@ -23,9 +23,12 @@ class NewsAdapter(val onclick: (doc: Doc) -> Unit) :
                         Picasso.get().load(image).into(newsImage);
                     } else {
                         newsImage.setImageResource(android.R.color.transparent);
-                        Log.e("TAG", "bind: the multimedia is empty", )
+                        Log.e("TAG", "bind: the multimedia is empty")
                     }
 
+                }
+                bookmarkImage.setOnClickListener {
+                    it.isSelected = !it.isSelected
                 }
 
             }
