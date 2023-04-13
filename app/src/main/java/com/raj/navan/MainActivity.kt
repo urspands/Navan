@@ -9,6 +9,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.raj.navan.WebNews.Companion.CONTENT
+import com.raj.navan.WebNews.Companion.URL
 import com.raj.navan.databinding.ActivityMainBinding
 import com.raj.navan.viewModel.MainViewModel
 import com.raj.navan.viewModel.UiState
@@ -39,7 +41,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(_binding.root)
         newsAdapter = NewsAdapter() {
             val intent = Intent(this@MainActivity, WebNews::class.java)
-            intent.putExtra("url", it.web_url)
+            it.multimedia?.let {mul->
+                if (mul.isNotEmpty()) {
+                    val image = "${NewsAdapter.IMAGE_BASE_URL}${mul[0].url}"
+                    intent.putExtra(URL, image)
+                }
+            }
+
+            intent.putExtra(CONTENT, it.abstract)
             startActivity(intent)
         }
         _binding.apply {
@@ -56,7 +65,7 @@ class MainActivity : AppCompatActivity() {
                 is UiState.Error -> Toast.makeText(this@MainActivity, "OOPS", Toast.LENGTH_SHORT)
                     .show()
                 UiState.Loading -> {
-                  //loading progress
+                    //loading progress
                 }
                 is UiState.NewsResponseSuccess -> {
                     Log.d("TAG", "onCreate: ${it.data.response.docs.size}")

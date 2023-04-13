@@ -11,6 +11,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(private val newsRepository: NewsRepository) : ViewModel() {
     private val _searchString = MutableLiveData<String>("")
     private var _newsResponse = _searchString.switchMap { loadNews(it) }
+    private val _newsUiModel = _newsResponse.map {  }
 
     val mediatorLiveData = MediatorLiveData<UiState>().apply {
         addSource(_newsResponse) {
@@ -24,6 +25,7 @@ class MainViewModel @Inject constructor(private val newsRepository: NewsReposito
             _searchString.value = searchStr
         }
     }
+
 
     private fun loadNews(searchStr: String): LiveData<UiState> {
         return liveData {
